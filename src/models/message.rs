@@ -17,6 +17,16 @@ impl Default for MessageType {
     }
 }
 
+impl Into<String> for MessageType {
+    fn into(self) -> String {
+        match self {
+            MessageType::Sync => "sync".to_string(),
+            MessageType::Statistics => "statistics".to_string(),
+            MessageType::Response => "response".to_string(),
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ClientIdentifier {
     pub name: String,
@@ -42,15 +52,21 @@ impl From<String> for ClientIdentifier {
     }
 }
 
-pub struct AuthData {
-    pub org: String,
-    pub user: String,
-    pub key: String,
+impl Into<String> for ClientIdentifier {
+    fn into(self) -> String {
+        format!("{} {}", self.name, self.version)
+    }
+}
+
+pub trait Auth {
+    fn org(&self) -> String;
+    fn user(&self) -> String;
+    fn key(&self) -> String;
 }
 
 pub struct Header {
-    name: String,
-    value: String,
+    pub name: String,
+    pub value: String,
 }
 
 impl From<&str> for Header {
@@ -59,14 +75,5 @@ impl From<&str> for Header {
         let name = parts.next().unwrap().to_string();
         let value = parts.next().unwrap().to_string();
         Header { name, value }
-    }
-}
-
-impl Header {
-    pub fn name(&self) -> String {
-        self.name.to_string()
-    }
-    pub fn value(&self) -> String {
-        self.value.to_string()
     }
 }
