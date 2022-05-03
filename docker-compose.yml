@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  taskd:
+    image: connectical/taskd
+    restart: always
+    ports:
+      - "53589:53589"
+    volumes:
+      - ./testbench/taskd:/var/taskd
