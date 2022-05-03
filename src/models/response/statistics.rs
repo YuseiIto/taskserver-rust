@@ -110,31 +110,31 @@ impl StatisticsResponse {
         for line in lines {
             let header = Header::from(line);
 
-            match header.name().as_str() {
-                "client" => res.client = ClientIdentifier::from(header.value()),
-                "protocol" => res.protocol = header.value(),
-                "code" => res.code = StatusCode::from(header.value().parse::<u16>().unwrap()),
-                "status" => res.status = header.value(),
+            match header.name.as_str() {
+                "client" => res.client = ClientIdentifier::from(header.value),
+                "protocol" => res.protocol = header.value,
+                "code" => res.code = StatusCode::from(header.value.parse::<u16>().unwrap()),
+                "status" => res.status = header.value,
                 "average request bytes" => {
-                    res.average_request_bytes = header.value().parse::<usize>().unwrap()
+                    res.average_request_bytes = header.value.parse::<usize>().unwrap()
                 }
                 "average response bytes" => {
-                    res.average_response_bytes = header.value().parse::<usize>().unwrap()
+                    res.average_response_bytes = header.value.parse::<usize>().unwrap()
                 }
                 "average response time" => {
-                    res.average_response_time = header.value().parse::<f32>().unwrap()
+                    res.average_response_time = header.value.parse::<f32>().unwrap()
                 }
-                "errors" => res.errors = header.value().parse::<u32>().unwrap(),
-                "idle" => res.idle = header.value().parse::<f32>().unwrap(),
+                "errors" => res.errors = header.value.parse::<u32>().unwrap(),
+                "idle" => res.idle = header.value.parse::<f32>().unwrap(),
                 "maximum response time" => {
-                    res.maximum_response_time = header.value().parse::<f32>().unwrap()
+                    res.maximum_response_time = header.value.parse::<f32>().unwrap()
                 }
-                "total bytes in" => res.total_bytes_in = header.value().parse::<usize>().unwrap(),
-                "total bytes out" => res.total_bytes_out = header.value().parse::<usize>().unwrap(),
-                "tps" => res.tps = header.value().parse::<f32>().unwrap(),
-                "transactions" => res.transactions = header.value().parse::<u32>().unwrap(),
-                "uptime" => res.uptime = header.value().parse::<u32>().unwrap(),
-                _ => info!("Encounterd unknown header: {}", header.name()),
+                "total bytes in" => res.total_bytes_in = header.value.parse::<usize>().unwrap(),
+                "total bytes out" => res.total_bytes_out = header.value.parse::<usize>().unwrap(),
+                "tps" => res.tps = header.value.parse::<f32>().unwrap(),
+                "transactions" => res.transactions = header.value.parse::<u32>().unwrap(),
+                "uptime" => res.uptime = header.value.parse::<u32>().unwrap(),
+                _ => info!("Encounterd unknown header: {}", header.name),
             }
         }
 
