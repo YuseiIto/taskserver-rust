@@ -1,5 +1,5 @@
 pub mod models;
-
+pub mod statistics;
 #[cfg(test)]
 mod tests {
     #[test]

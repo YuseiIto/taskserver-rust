@@ -1,7 +1,7 @@
 use super::super::message::{Auth, ClientIdentifier, Header, Message, MessageType};
 use super::Request;
 
-struct StatisticsRequest {
+pub struct StatisticsRequest {
     org: String,
     user: String,
     key: String,
