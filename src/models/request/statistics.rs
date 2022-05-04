@@ -1,19 +1,30 @@
 use super::super::message::{Auth, ClientIdentifier, Header, Message, MessageType};
 use super::Request;
 
+#[derive(Debug)]
 pub struct StatisticsRequest {
-    org: String,
-    user: String,
-    key: String,
-    client: ClientIdentifier,
-    protocol: String,
+    pub org: String,
+    pub user: String,
+    pub key: String,
+    pub client: ClientIdentifier,
+    pub protocol: String,
+}
+
+impl Request for StatisticsRequest {}
+
+impl Default for StatisticsRequest {
+    fn default() -> Self {
+        StatisticsRequest {
+            org: String::default(),
+            user: String::default(),
+            key: String::default(),
+            client: ClientIdentifier::default(),
+            protocol: "v1".to_string(),
+        }
+    }
 }
 
 impl Message for StatisticsRequest {
-    fn size(&self) -> usize {
-        0
-    }
-
     fn msg_type() -> MessageType {
         MessageType::Statistics
     }
@@ -24,21 +35,7 @@ impl Message for StatisticsRequest {
     fn client(&self) -> ClientIdentifier {
         self.client.clone()
     }
-}
 
-impl Auth for StatisticsRequest {
-    fn org(&self) -> String {
-        self.org.clone()
-    }
-    fn user(&self) -> String {
-        self.user.clone()
-    }
-    fn key(&self) -> String {
-        self.key.clone()
-    }
-}
-
-impl Request for StatisticsRequest {
     fn collect_headers(&self) -> Vec<Header> {
         let mut headers = Vec::new();
 
@@ -77,5 +74,17 @@ impl Request for StatisticsRequest {
 
     fn collect_body(&self) -> Option<String> {
         None
+    }
+}
+
+impl Auth for StatisticsRequest {
+    fn org(&self) -> String {
+        self.org.clone()
+    }
+    fn user(&self) -> String {
+        self.user.clone()
+    }
+    fn key(&self) -> String {
+        self.key.clone()
     }
 }

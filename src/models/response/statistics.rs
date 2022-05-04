@@ -4,7 +4,6 @@ use log::info;
 
 #[derive(Debug, Default)]
 pub struct StatisticsResponse {
-    size: usize,
     client: ClientIdentifier,
     protocol: String,
     code: StatusCode,
@@ -37,16 +36,58 @@ impl Message for StatisticsResponse {
         MessageType::Response
     }
 
-    fn size(&self) -> usize {
-        self.size
-    }
-
     fn client(&self) -> ClientIdentifier {
         self.client.clone()
     }
 
     fn protocol(&self) -> String {
         self.protocol.to_string()
+    }
+
+    fn collect_body(&self) -> Option<String> {
+        None
+    }
+
+    fn collect_headers(&self) -> Vec<Header> {
+        [
+            ("type".to_string(), MessageType::Response.into()),
+            ("client".to_string(), self.client().into()),
+            ("protocol".to_string(), self.protocol()),
+            ("code".to_string(), (self.code() as u32).to_string()),
+            ("status".to_string(), self.status().to_string()),
+            (
+                "average request bytes".to_string(),
+                self.average_request_bytes().to_string(),
+            ),
+            (
+                "average response bytes".to_string(),
+                self.average_response_bytes().to_string(),
+            ),
+            (
+                "average response time".to_string(),
+                self.average_response_time().to_string(),
+            ),
+            ("errors".to_string(), self.errors().to_string()),
+            ("idle".to_string(), self.idle().to_string()),
+            (
+                "maximum response time".to_string(),
+                self.maximum_response_time().to_string(),
+            ),
+            (
+                "total bytes in".to_string(),
+                self.total_bytes_in().to_string(),
+            ),
+            (
+                "total bytes out".to_string(),
+                self.total_bytes_out().to_string(),
+            ),
+            ("tps".to_string(), self.tps().to_string()),
+            ("transactions".to_string(), self.transactions().to_string()),
+            ("uptime".to_string(), self.uptime().to_string()),
+        ]
+        .iter()
+        .map(|(n, v)| Header::new(n, v))
+        .collect::<Vec<Header>>()
     }
 }
 
@@ -78,7 +119,7 @@ impl StatisticsResponse {
     pub fn total_bytes_in(&self) -> usize {
         self.total_bytes_in
     }
-    pub fn total_bytes_ou(&self) -> usize {
+    pub fn total_bytes_out(&self) -> usize {
         self.total_bytes_out
     }
     pub fn tps(&self) -> f32 {
@@ -92,24 +133,13 @@ impl StatisticsResponse {
     }
 
     pub fn parse(text: &str) -> Self {
-        let size: String = text.chars().take_while(|c| c.is_digit(10)).collect();
-        let size_digit_number = size.len();
-        let size = size.parse::<usize>().unwrap();
-
-        let header = text.chars().skip(size_digit_number).collect::<String>();
-        let lines = header
-            .lines()
-            .take_while(|&line| line.len() > 0)
-            .collect::<Vec<&str>>();
-
-        let mut res = StatisticsResponse {
-            size,
-            ..StatisticsResponse::default()
+        let mut res = Self {
+            ..Default::default()
         };
 
-        for line in lines {
-            let header = Header::from(line);
+        let headers = Self::parse_headers(text);
 
+        for header in headers {
             match header.name.as_str() {
                 "client" => res.client = ClientIdentifier::from(header.value),
                 "protocol" => res.protocol = header.value,
